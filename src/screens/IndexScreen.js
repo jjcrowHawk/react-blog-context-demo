@@ -1,12 +1,12 @@
 //import liraries
 import React, { Component, useContext } from 'react';
-import { View, Text, StyleSheet, FlatList, Button } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Button, TouchableOpacity } from 'react-native';
 import { Context as BlogContext } from '../context/BlogContext'
 import { Feather } from '@expo/vector-icons'
 
 // create a component
-const IndexScreen = () => {
-  const { state, addBlogPost } = useContext(BlogContext)
+const IndexScreen = ({ navigation }) => {
+  const { state, addBlogPost, deleteBlogPost } = useContext(BlogContext)
 
   return (
     <View style={styles.container}>
@@ -18,17 +18,33 @@ const IndexScreen = () => {
         keyExtractor={(blogPost) => blogPost.title}
         renderItem={({ item }) => {
           return (
-            <View style={styles.row}>
-              <Text style={styles.title}>
-                {item.title}
-              </Text>
-              <Feather style={styles.icon} name='trash' color='red' />
-            </View>
+            <TouchableOpacity onPress={() => navigation.navigate('Show', { id: item.id })}>
+              <View style={styles.row}>
+                <Text style={styles.title}>
+                  {item.title}
+                </Text>
+                <TouchableOpacity onPress={() => deleteBlogPost(item.id)}>
+                  <Feather style={styles.icon} name='trash' color='red' />
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
           )
         }} />
     </View>
   );
 };
+
+IndexScreen.navigationOptions = ({ navigation }) => {
+  return {
+    headerRight: () => {
+      return (
+        <TouchableOpacity onPress={() => navigation.navigate('Create')}>
+          <Feather style={styles.headerIcon} name="plus" size={30} />
+        </TouchableOpacity>
+      )
+    }
+  };
+}
 
 // define your styles
 const styles = StyleSheet.create({
@@ -49,11 +65,14 @@ const styles = StyleSheet.create({
     fontSize: 18
   },
   icon: {
-    fontSize: 24
+    fontSize: 28
   },
   button: {
     marginVertical: 30,
     marginHorizontal: 50
+  },
+  headerIcon: {
+    marginRight: 10
   }
 });
 
