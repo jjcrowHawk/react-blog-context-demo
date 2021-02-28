@@ -1,18 +1,15 @@
 //import liraries
 import React, { Component, useContext } from 'react';
-import { View, Text, StyleSheet, FlatList, Button, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { Context as BlogContext } from '../context/BlogContext'
 import { Feather } from '@expo/vector-icons'
 
 // create a component
 const IndexScreen = ({ navigation }) => {
-  const { state, addBlogPost, deleteBlogPost } = useContext(BlogContext)
+  const { state, deleteBlogPost } = useContext(BlogContext)
 
   return (
     <View style={styles.container}>
-      <View style={styles.button}>
-        <Button title={"Add Blog Post"} onPress={addBlogPost} />
-      </View>
       <FlatList
         data={state}
         keyExtractor={(blogPost) => blogPost.title}
