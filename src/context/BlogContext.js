@@ -1,15 +1,19 @@
+import { call } from 'react-native-reanimated'
+import jsonServer from '../api/jsonServer'
 import createDataContext from './createDataContext'
 
 //Reducer for blogPost state
 const BlogReducer = (state, action) => {
   switch (action.type) {
-    case 'ADD_BLOGPOST':
+    case 'GET_BLOGPOSTS':
+      return action.payload
+    /* case 'ADD_BLOGPOST':
       return [...state,
       {
         id: Math.floor(Math.random() * 999999),
         title: action.payload.title,
         content: action.payload.content
-      }]
+      }] */
     case 'DELETE_BLOGPOST':
       return state.filter(post => post.id !== action.payload.id)
     case 'EDIT_BLOGPOST':
@@ -22,8 +26,23 @@ const BlogReducer = (state, action) => {
 }
 
 //actions for reducer
+const getBlogPosts = (dispatch) => {
+  return async () => {
+    const response= await jsonServer.get('/blogposts');
+
+    dispatch({ type: 'GET_BLOGPOSTS', payload: response.data })
+  };
+};
+
 const addBlogPost = (dispatch) => {
-  return (title, content) => {
+  return async (title, content, callback) => {
+    await jsonServer.post('/blogposts', { title, content });
+    
+    if(callback) {
+      callback();
+    }
+  }
+  /* return (title, content) => {
     return new Promise((resolve, reject) => {
       try {
         dispatch({ type: 'ADD_BLOGPOST', payload: { title, content } })
@@ -32,18 +51,25 @@ const addBlogPost = (dispatch) => {
         reject(error)
       }
     })
-  }
+  } */
 }
 
 const deleteBlogPost = (dispatch) => {
-  return (id) => {
+  return async (id) => {
+    await jsonServer.delete(`/blogposts/${id}`);
     dispatch({ type: 'DELETE_BLOGPOST', payload: { id } })
   }
 }
 
 const editBlogPost = (dispatch) => {
-  return (id, title, content) => {
-    return new Promise((resolve, reject) => {
+  return async (id, title, content, callback) => {
+    await jsonServer.put(`/blogposts/${id}`, { title, content });
+
+    if(callback){
+      callback();
+    }
+
+    /* return new Promise((resolve, reject) => {
       try {
         dispatch({
           type: 'EDIT_BLOGPOST',
@@ -53,15 +79,15 @@ const editBlogPost = (dispatch) => {
       } catch (error) {
         reject(error)
       }
-    })
+    }) */
 
   }
 }
 
 export const { Context, Provider } = createDataContext(
   BlogReducer,
-  { addBlogPost, deleteBlogPost, editBlogPost },
-  [{ title: 'TEST POST', content: 'TEST CONTENT', id: 1 }]
+  { addBlogPost, deleteBlogPost, editBlogPost, getBlogPosts },
+  []
 )
 
 /* export const BlogProvider = ({ children }) => {

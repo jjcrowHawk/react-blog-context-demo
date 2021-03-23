@@ -3,10 +3,24 @@ import React, { Component, useContext } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { Context as BlogContext } from '../context/BlogContext'
 import { Feather } from '@expo/vector-icons'
+import { useEffect } from 'react';
 
 // create a component
 const IndexScreen = ({ navigation }) => {
-  const { state, deleteBlogPost } = useContext(BlogContext)
+  const { state, deleteBlogPost, getBlogPosts } = useContext(BlogContext)
+
+  useEffect(() => {
+    getBlogPosts();
+
+
+    const listener= navigation.addListener('didFocus', () => {
+      getBlogPosts();
+    });
+
+    return () => {
+      listener.remove();
+    };
+  }, [])
 
   return (
     <View style={styles.container}>
